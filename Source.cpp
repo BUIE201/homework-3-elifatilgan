@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <map>
 using namespace std;
 struct Node
 {
@@ -34,45 +35,68 @@ void Insert(Node*& pRoot, Node* pNewNode)
 			Insert(pRoot->pRight, pNewNode);
 	}
 }
-void printResults(int* arr, int len)
+void printResults(int arr[], int len, int sum)
+{
+	for (int i = 0; i < len; i++)
+	{
+		cout << arr[i] << " ";
+	}
+	cout << "sum";
+}
+int calculateSum(int arr[], int len)
 {
 	int sum = 0;
 	for (int i = 0; i < len; i++)
 	{
-		cout << arr[i] << " ";
 		sum += arr[i];
 	}
-	cout << "->SUM = " << sum << endl;
+	return sum;
 }
-
-void printPathsRecur(Node* node, int path[], int pathLen);
+map<pair<int*, int>, int> printPathsRecur(Node* node, int path[], int pathLen);
 
 void printPaths(Node* node)
 {
+	map<pair<int*, int>, int> temp;
 	int path[1000]; //1000 is enough capacity.
-	printPathsRecur(node, path, 0);
+	temp = printPathsRecur(node, path, 0);
+	
+		int a = 0;
+		pair<int*, int> b;
+		map<pair<int*, int>, int>::iterator itr;
+		for (itr = temp.begin(); itr != temp.end(); itr++)
+		{
+			if (itr->second > a)
+			{
+				a = itr->second;
+				b = itr->first;
+			}
+		}
+		printResults(b.first, b.second, a);
+	
 }
 
-void printPathsRecur(Node* node, int path[], int pathLen)
+map<pair<int*, int>, int> printPathsRecur(Node* node, int path[], int pathLen)
 {
-	if (node == NULL)
-		return;
-
-	/* append this node to the path array */
+	map<pair<int*, int>, int> Results;
+	
+	/* add this node to the path array */
 	path[pathLen] = node->i;
 	pathLen++;
 
-	/* if it's a leaf,print the path that led to there */
+	/* if it's a leaf,get the path that led to there */
 	if (node->pLeft == NULL && node->pRight == NULL)
 	{
-		printResults(path, pathLen);
+		auto x = make_pair(path, pathLen);
+		Results.insert(pair<pair<int*, int>, int>(x, calculateSum(path, pathLen)));
+		return Results;
 	}
 	else
 	{
-		/* otherwise try both subtrees */
-		printPathsRecur(node->pLeft, path, pathLen);
-		printPathsRecur(node->pRight, path, pathLen);
+		/* otherwise try subtrees */
+		if(node->pLeft != NULL) printPathsRecur(node->pLeft, path, pathLen);
+		if(node->pRight!= NULL) printPathsRecur(node->pRight, path, pathLen);
 	}
+	
 }
 
 

@@ -35,66 +35,66 @@ void Insert(Node*& pRoot, Node* pNewNode)
 			Insert(pRoot->pRight, pNewNode);
 	}
 }
-void printResults(int arr[], int len, int sum)
+void printResults(vector<int> x, int sum)
 {
-	for (int i = 0; i < len; i++)
+	cout << "Branch with the largest sum is: ";
+	for (int i = 0; i < x.size();i++) 
 	{
-		cout << arr[i] << " ";
+		cout << x[i] << " ";
 	}
-	cout << "sum";
+	cout << " -> SUM= " << sum;
+	
 }
-int calculateSum(int arr[], int len)
+int calculateSum(vector<int> arr)
 {
 	int sum = 0;
-	for (int i = 0; i < len; i++)
+	for (int i = 0; i <arr.size(); i++)
 	{
 		sum += arr[i];
 	}
 	return sum;
 }
-map<pair<int*, int>, int> printPathsRecur(Node* node, int path[], int pathLen);
+void printPathsRecur(Node* node, vector<int> path, map<vector<int>, int>& results);
 
 void printPaths(Node* node)
 {
-	map<pair<int*, int>, int> temp;
-	int path[1000]; //1000 is enough capacity.
-	temp = printPathsRecur(node, path, 0);
+	map<vector<int>, int> Results;
+	vector<int> path; 
+	printPathsRecur(node, path,Results);
 	
 		int a = 0;
-		pair<int*, int> b;
-		map<pair<int*, int>, int>::iterator itr;
-		for (itr = temp.begin(); itr != temp.end(); itr++)
+		auto max_branch = Results.begin()->first;
+		for (auto itr = Results.begin(); itr != Results.end(); ++itr)
 		{
 			if (itr->second > a)
 			{
 				a = itr->second;
-				b = itr->first;
+				max_branch = itr->first;
 			}
 		}
-		printResults(b.first, b.second, a);
+		
+		printResults(max_branch,a);
 	
 }
 
-map<pair<int*, int>, int> printPathsRecur(Node* node, int path[], int pathLen)
+void printPathsRecur(Node* node, vector<int> path, map<vector<int>, int>& Results)
 {
-	map<pair<int*, int>, int> Results;
+	
 	
 	/* add this node to the path array */
-	path[pathLen] = node->i;
-	pathLen++;
+	path.push_back(node->i);
 
 	/* if it's a leaf,get the path that led to there */
 	if (node->pLeft == NULL && node->pRight == NULL)
 	{
-		auto x = make_pair(path, pathLen);
-		Results.insert(pair<pair<int*, int>, int>(x, calculateSum(path, pathLen)));
-		return Results;
+		Results.emplace(pair<vector<int>,int>(path, calculateSum(path)));
+		
 	}
 	else
 	{
 		/* otherwise try subtrees */
-		if(node->pLeft != NULL) printPathsRecur(node->pLeft, path, pathLen);
-		if(node->pRight!= NULL) printPathsRecur(node->pRight, path, pathLen);
+		if(node->pLeft != NULL) printPathsRecur(node->pLeft, path,Results);
+		if(node->pRight!= NULL) printPathsRecur(node->pRight, path, Results);
 	}
 	
 }
